@@ -1,0 +1,29 @@
+services:
+  # Backend Service
+  - type: web
+    name: 3dprintshop-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node server-clean.cjs
+    envVars:
+      - key: PORT
+        value: 4242
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: 3d print shop admin
+      - key: ADMIN_PASSWORD
+        value: 3dprintshopadmin@#
+
+  # Frontend Service
+  - type: web
+    name: 3dprintshop-frontend
+    env: static
+    buildCommand: npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: 3dprintshop-backend
+          property: host

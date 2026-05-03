@@ -1,0 +1,27 @@
+{
+  "methods": [
+    {
+      "id": "card-online-",
+      "label": "Card (Online)",
+      "type": "stripe",
+      "enabled": true
+    },
+    {
+      "id": "cash-on-delivery",
+      "label": "Cash on Delivery",
+      "type": "manual",
+      "enabled": true
+    },
+    {
+      "id": "cliq",
+      "label": "Cliq",
+      "type": "stripe",
+      "enabled": true
+    }
+  ],
+  "gateway": {
+    "stripeEnabled": true,
+    "amount": 1000,
+    "currency": "jod"
+  }
+}
