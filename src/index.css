@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3D Print Shop — Clinical Precision design system. All colors HSL. */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 6% 6%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 6% 6%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 6% 6%;
+
+    /* Industrial ink (near-black) */
+    --primary: 240 6% 6%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Industrial bg (cool light gray) */
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 6%;
+
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+
+    --accent: 0 72% 51%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Industrial line */
+    --border: 240 5% 84%;
+    --input: 240 5% 84%;
+    --ring: 240 6% 6%;
+
+    /* Custom palette */
+    --panel: 0 0% 100%;
+    --panel-muted: 240 5% 96%;
+    --line: 240 5% 84%;
+    --line-soft: 240 5% 90%;
+    --ink: 240 6% 6%;
+    --ink-muted: 240 4% 46%;
+
+    --radius: 0;
+
+    --shadow-panel: 0 0 0 1px hsl(240 6% 6% / 0.05), 0 4px 24px hsl(240 6% 6% / 0.06);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply antialiased;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-secondary text-foreground;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer utilities {
+  .grid-dots {
+    background-image: radial-gradient(hsl(var(--line)) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .shadow-panel {
+    box-shadow: var(--shadow-panel);
+  }
+}
