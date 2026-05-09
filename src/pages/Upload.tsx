@@ -19,9 +19,8 @@ const jordanGovernorates = [
   "Karak",
   "Tafilah",
   "Ma'an",
-  "Aqaba",
 ];
-const printMaterials = ["PLA", "PETG", "ABS", "TPU", "Resin"];
+const printMaterials = ["PLA", "PETG", "ABS", "TPU"];
 const jordanPhoneRegex = /^(?:\+962|0)7[789]\d{7}$/;
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') ? "http://localhost:4242" : window.location.origin);
 
