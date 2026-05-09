@@ -244,6 +244,12 @@ const server = http.createServer(async (req, res) => {
       const basePrice = Number(body.unitPrice || 0) * Number(body.quantity || 1);
       const totalOrderPrice = basePrice + shippingCost;
 
+      // Validate payment method for orders over 20 JOD
+      if (totalOrderPrice > 20 && (body.paymentMethod === 'Cash on Delivery' || !body.paymentMethod)) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ error: 'Orders over 20 JOD require prepayment. Cash on Delivery is not available for orders over 20 JOD.' }));
+      }
+
       const newOrder = {
         id: crypto.randomUUID(),
         clientName: body.clientName,
