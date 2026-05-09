@@ -1,32 +1,10 @@
-import { Phone, Instagram, MapPin, Clock, ArrowUpRight, Star } from "lucide-react";
+import { Phone, Instagram, MapPin, Clock, ArrowUpRight, Star, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/i18n/LanguageContext";
 import heroPrint from "@/assets/hero-print.jpg";
 import workMiniature from "@/assets/f1-track.png";
 import workPrototype from "@/assets/work-prototype.jpg";
 import workArchitecture from "@/assets/work-architecture.jpg";
-
-const services = [
-  {
-    code: "PROCESS.01",
-    title: "FDM Printing",
-    desc: "Engineering-grade thermoplastics — PLA, PETG, ABS, TPU. Functional parts, jigs, and concept models.",
-  },
-  {
-    code: "PROCESS.02",
-    title: "Slicing & Print Prep",
-    desc: "Optimized G-code with calibrated layer heights, supports, and infill. Tuned per material and geometry to balance strength, surface finish, and runtime.",
-  },
-  {
-    code: "PROCESS.03",
-    title: "3D Modeling & Design",
-    desc: "From sketch or reference to print-ready CAD. Parametric models, organic sculpts, and reverse engineering.",
-  },
-  {
-    code: "PROCESS.04",
-    title: "Post-Processing",
-    desc: "Sanding, priming, painting, and assembly. Show-ready finishes calibrated to your spec.",
-  },
-];
 
 const works = [
   { src: workMiniature, label: "f1 track design", spec: "SLA · 25µm" },
@@ -53,25 +31,59 @@ const reviews = [
 ];
 
 const Index = () => {
+  const { language, setLanguage, t } = useLanguage();
+
+  const services = [
+    {
+      code: "PROCESS.01",
+      title: t.services.fdmTitle,
+      desc: t.services.fdmDesc,
+    },
+    {
+      code: "PROCESS.02",
+      title: t.services.slicingTitle,
+      desc: t.services.slicingDesc,
+    },
+    {
+      code: "PROCESS.03",
+      title: t.services.modelingTitle,
+      desc: t.services.modelingDesc,
+    },
+    {
+      code: "PROCESS.04",
+      title: t.services.postProcessingTitle,
+      desc: t.services.postProcessingDesc,
+    },
+  ];
+
   return (
     <div className="min-h-dvh bg-secondary p-2 md:p-6 text-ink">
       <div className="bg-panel border border-line shadow-panel">
         {/* Header */}
         <header className="flex items-center justify-between border-b border-line px-4 md:px-6 py-4 text-xs font-mono uppercase tracking-wider">
           <div className="flex items-center gap-3 md:gap-4">
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+              className="flex items-center gap-2 px-2 py-1 border border-line-soft hover:bg-panel-muted transition-colors"
+              title="Change language"
+            >
+              <Globe className="size-3.5" />
+              <span className="hidden sm:inline">{language === 'en' ? 'العربية' : 'English'}</span>
+              <span className="sm:hidden">{language === 'en' ? 'AR' : 'EN'}</span>
+            </button>
             <span className="font-bold text-sm tracking-widest">3D PRINT SHOP</span>
             <span className="hidden sm:inline px-2 py-0.5 bg-panel-muted border border-line-soft">AMM.JO</span>
           </div>
           <nav className="hidden md:flex gap-10 text-ink-muted">
-            <a href="#services" className="hover:text-ink transition-colors">Services</a>
-            <a href="#work" className="hover:text-ink transition-colors">Work</a>
-            <a href="#reviews" className="hover:text-ink transition-colors">Reviews</a>
-            <a href="#visit" className="hover:text-ink transition-colors">Visit</a>
-            <Link to="/upload" className="hover:text-ink transition-colors">Checkout</Link>
+            <a href="#services" className="hover:text-ink transition-colors">{t.common.services || 'Services'}</a>
+            <a href="#work" className="hover:text-ink transition-colors">{t.common.work || 'Work'}</a>
+            <a href="#reviews" className="hover:text-ink transition-colors">{t.common.reviews || 'Reviews'}</a>
+            <a href="#visit" className="hover:text-ink transition-colors">{t.common.visit || 'Visit'}</a>
+            <Link to="/upload" className="hover:text-ink transition-colors">{t.common.checkout || 'Checkout'}</Link>
           </nav>
           <div className="flex items-center gap-2 md:gap-3 text-accent">
             <span className="size-1.5 bg-accent rounded-full animate-pulse" aria-hidden />
-            <span className="tracking-widest">Open Today</span>
+            <span className="tracking-widest">{t.index.openToday}</span>
           </div>
         </header>
 
@@ -80,25 +92,25 @@ const Index = () => {
           <div className="lg:col-span-7 flex flex-col px-6 lg:px-16 py-12 lg:py-24 justify-between">
             <div>
               <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-10 border-l-2 border-accent pl-4 py-1">
-                Protocol: Additive Manufacturing<br />
-                Location: Amman, JO · Al-Jalil St., Office 208
+                {t.index.protocol}: Additive Manufacturing<br />
+                {t.index.location}: Amman, JO · Al-Jalil St., Office 208
               </div>
               <h1 className="text-5xl lg:text-7xl font-semibold tracking-tight text-balance leading-[0.95] mb-8">
-                DIMENSIONAL<br />EXACTITUDE.
+                {t.index.heroTitle}
               </h1>
               <p className="max-w-[48ch] text-base lg:text-lg text-ink-muted leading-relaxed font-mono">
-                Professional 3D printing in Amman. SLA and FDM fabrication for engineers, designers, hobbyists, and creators. From single prototypes to short-run production.
+                {t.index.heroSubtitle}
               </p>
             </div>
 
             <div className="mt-16 lg:mt-20 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 border-t border-line pt-10">
               <div className="flex flex-col justify-end">
                 <div className="font-mono text-[10px] text-ink-muted mb-3 uppercase tracking-widest">
-                  Client Verification
+                  {t.index.clientVerification}
                 </div>
                 <div className="flex items-baseline gap-3">
                   <span className="text-4xl font-mono tabular-nums tracking-tighter">4.8</span>
-                  <span className="text-sm font-mono text-ink-muted uppercase tracking-widest">/ 5.0</span>
+                  <span className="text-sm font-mono text-ink-muted uppercase tracking-widest">{t.index.outOf}</span>
                 </div>
                 <div className="flex items-center gap-1 mt-2" aria-label="4.8 out of 5 stars">
                   {[0, 1, 2, 3, 4].map((i) => (
@@ -106,7 +118,7 @@ const Index = () => {
                   ))}
                 </div>
                 <div className="text-xs font-mono text-ink-muted mt-2">
-                  <span className="text-ink font-bold tabular-nums">49</span> verified reviews on Google
+                  <span className="text-ink font-bold tabular-nums">49</span> {t.index.verifiedReviews}
                 </div>
               </div>
 
@@ -116,7 +128,7 @@ const Index = () => {
                   className="bg-ink text-panel px-6 py-4 font-mono text-sm uppercase tracking-widest hover:bg-accent transition-colors flex justify-between items-center group"
                 >
                   <span className="flex items-center gap-2">
-                    <Phone className="size-4" /> Call: 079 945 8828
+                    <Phone className="size-4" /> {t.index.call}: 079 945 8828
                   </span>
                   <ArrowUpRight className="size-4 opacity-40 group-hover:opacity-100 transition-opacity" />
                 </a>
@@ -124,14 +136,14 @@ const Index = () => {
                   href="#visit"
                   className="border border-line px-6 py-3 font-mono text-sm uppercase tracking-widest hover:bg-panel-muted transition-colors text-ink-muted hover:text-ink flex justify-between items-center"
                 >
-                  Visit the Shop
+                  {t.index.visitShop}
                   <ArrowUpRight className="size-4" />
                 </a>
                 <Link
                   to="/upload"
                   className="border border-line px-6 py-3 font-mono text-sm uppercase tracking-widest hover:bg-panel-muted transition-colors text-ink-muted hover:text-ink flex justify-between items-center"
                 >
-                  Checkout & Upload
+                  {t.index.checkoutUpload}
                   <ArrowUpRight className="size-4" />
                 </Link>
               </div>
@@ -185,10 +197,10 @@ const Index = () => {
               <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-2">
                 Section.02
               </div>
-              <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight">Capabilities</h2>
+              <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight">{t.index.capabilities}</h2>
             </div>
             <div className="hidden md:block font-mono text-xs text-ink-muted uppercase tracking-widest">
-              4 Processes / End-to-End
+              4 {t.index.processes} / {t.index.endToEnd}
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-line">
@@ -214,10 +226,10 @@ const Index = () => {
               <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-2">
                 Section.03
               </div>
-              <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight">Selected Output</h2>
+              <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight">{t.index.selectedOutput}</h2>
             </div>
             <div className="hidden md:block font-mono text-xs text-ink-muted uppercase tracking-widest">
-              Live Archive
+              {t.index.liveArchive}
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-line">
@@ -253,10 +265,10 @@ const Index = () => {
               <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-2">
                 Section.04
               </div>
-              <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight">Client Telemetry</h2>
+              <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight">{t.index.clientTelemetry}</h2>
             </div>
             <div className="hidden md:flex items-center gap-2 font-mono text-xs text-ink-muted uppercase tracking-widest">
-              <span className="text-ink font-bold">4.8</span> avg · <span>49 reviews</span>
+              <span className="text-ink font-bold">4.8</span> {t.index.avg} · <span>49 {t.index.reviews}</span>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-line">
@@ -285,24 +297,24 @@ const Index = () => {
                 Section.05
               </div>
               <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight mb-8">
-                Visit the Workshop
+                {t.index.visitWorkshop}
               </h2>
               <p className="text-ink-muted font-mono text-sm leading-relaxed mb-10 max-w-[40ch]">
-                Bring your file, sketch, or idea. Walk-ins welcome during business hours, or call ahead for a consultation.
+                {t.index.workshopDescription}
               </p>
 
               <dl className="space-y-6 font-mono text-sm">
                 <div className="flex gap-4 border-t border-line-soft pt-4">
                   <MapPin className="size-4 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <dt className="text-[10px] uppercase tracking-widest text-ink-muted mb-1">Address</dt>
+                    <dt className="text-[10px] uppercase tracking-widest text-ink-muted mb-1">{t.index.address}</dt>
                     <dd>Al-Jneini Bldg, Office 208<br />Al-Jalil St., Amman 11192, Jordan</dd>
                   </div>
                 </div>
                 <div className="flex gap-4 border-t border-line-soft pt-4">
                   <Phone className="size-4 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <dt className="text-[10px] uppercase tracking-widest text-ink-muted mb-1">Phone</dt>
+                    <dt className="text-[10px] uppercase tracking-widest text-ink-muted mb-1">{t.index.phone}</dt>
                     <dd>
                       <a href="tel:+962799458828" className="hover:text-accent transition-colors">
                         +962 79 945 8828
@@ -313,14 +325,14 @@ const Index = () => {
                 <div className="flex gap-4 border-t border-line-soft pt-4">
                   <Clock className="size-4 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <dt className="text-[10px] uppercase tracking-widest text-ink-muted mb-1">Hours</dt>
-                    <dd>Open today · Closes 9:00 PM</dd>
+                    <dt className="text-[10px] uppercase tracking-widest text-ink-muted mb-1">{t.index.hours}</dt>
+                    <dd>Open today · {t.index.closes} 9:00 PM</dd>
                   </div>
                 </div>
                 <div className="flex gap-4 border-t border-line-soft pt-4">
                   <Instagram className="size-4 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <dt className="text-[10px] uppercase tracking-widest text-ink-muted mb-1">Instagram</dt>
+                    <dt className="text-[10px] uppercase tracking-widest text-ink-muted mb-1">{t.index.instagram}</dt>
                     <dd>
                       <a
                         href="https://instagram.com"
@@ -345,7 +357,7 @@ const Index = () => {
               />
               <div className="absolute top-6 left-6 bg-panel border border-line p-4 font-mono text-xs shadow-panel max-w-xs">
                 <div className="text-[10px] uppercase tracking-widest text-ink-muted mb-2">
-                  Coordinates
+                  {t.index.coordinates}
                 </div>
                 <div className="tabular-nums">31.9925° N · 35.8800° E</div>
                 <div className="text-ink-muted mt-1">XW99+9C Amman</div>
@@ -357,27 +369,27 @@ const Index = () => {
         {/* Footer */}
         <footer className="border-t border-line grid grid-cols-2 lg:grid-cols-4 divide-x divide-line bg-panel font-mono text-[11px]">
           <div className="p-4 lg:p-6 flex flex-col gap-1.5">
-            <span className="text-ink-muted uppercase tracking-widest">Studio</span>
+            <span className="text-ink-muted uppercase tracking-widest">{t.index.studio}</span>
             <span className="font-bold text-sm tracking-tight text-ink">3D Print Shop</span>
             <span className="text-ink-muted">Amman, Jordan</span>
           </div>
           <div className="p-4 lg:p-6 flex flex-col gap-1.5">
-            <span className="text-ink-muted uppercase tracking-widest">Contact</span>
+            <span className="text-ink-muted uppercase tracking-widest">{t.index.contact}</span>
             <a href="tel:+962799458828" className="font-bold text-sm tracking-tight text-ink hover:text-accent">
               079 945 8828
             </a>
             <span className="text-ink-muted">Open · Closes 9 PM</span>
           </div>
           <div className="p-4 lg:p-6 flex flex-col gap-1.5">
-            <span className="text-ink-muted uppercase tracking-widest">Follow</span>
+            <span className="text-ink-muted uppercase tracking-widest">{t.index.follow}</span>
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="font-bold text-sm tracking-tight text-ink hover:text-accent">
               Instagram
             </a>
             <span className="text-ink-muted">@3dprintshop_amman</span>
           </div>
           <div className="p-4 lg:p-6 flex flex-col justify-center items-center bg-ink text-panel">
-            <div className="uppercase tracking-[0.2em] opacity-80 mb-1">Systems Nominal</div>
-            <div className="tabular-nums opacity-50">© {new Date().getFullYear()} ALL RIGHTS</div>
+            <div className="uppercase tracking-[0.2em] opacity-80 mb-1">{t.index.systemsNominal}</div>
+            <div className="tabular-nums opacity-50">© {new Date().getFullYear()} {t.index.allRights}</div>
           </div>
         </footer>
       </div>
