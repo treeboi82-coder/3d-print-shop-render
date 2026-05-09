@@ -39,6 +39,56 @@ const formatSize = (size: number) => {
   return `${(size / (1024 * 1024)).toFixed(2)} MB`;
 };
 
+// Chunked upload function for large files
+const uploadFileInChunks = async (file: File, orderId: string, onProgress?: (progress: number) => void) => {
+  const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks to stay under 10MB limit
+  const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+  const fileId = crypto.randomUUID();
+  
+  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+    const start = chunkIndex * CHUNK_SIZE;
+    const end = Math.min(start + CHUNK_SIZE, file.size);
+    const chunk = file.slice(start, end);
+    
+    const base64Chunk = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsDataURL(chunk);
+    });
+    
+    const chunkData = {
+      orderId,
+      fileId,
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      chunkIndex,
+      totalChunks,
+      chunkData: base64Chunk.split(',')[1], // Remove data URL prefix
+      isLastChunk: chunkIndex === totalChunks - 1
+    };
+    
+    const response = await fetch(`${apiBaseUrl}/upload-chunk`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(chunkData)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Chunk upload failed: ${response.statusText}`);
+    }
+    
+    if (onProgress) {
+      const progress = ((chunkIndex + 1) / totalChunks) * 100;
+      onProgress(progress);
+    }
+  }
+  
+  return fileId;
+};
+
 const parseAsciiStlVolumeMm3 = (text: string) => {
   const vertexRegex = /vertex\s+([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s+([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s+([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)/g;
   const vertices: [number, number, number][] = [];
@@ -363,16 +413,9 @@ const Upload = () => {
       return;
     }
 
-    if (selectedFile.size > 10 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Please upload a file smaller than 10 MB.",
-      });
-      return;
-    }
-
     setIsSending(true);
     try {
+      // Create order first
       const orderResponse = await fetch(`${apiBaseUrl}/orders`, {
         method: "POST",
         headers: {
@@ -396,7 +439,7 @@ const Upload = () => {
           fileName: selectedFile ? selectedFile.name : "",
           fileSize: selectedFile ? selectedFile.size : 0,
           fileType: selectedFile ? selectedFile.type : "",
-          fileBase64: selectedFile ? await readFileAsBase64(selectedFile) : "",
+          fileBase64: selectedFile && selectedFile.size <= 10 * 1024 * 1024 ? await readFileAsBase64(selectedFile) : "", // Only include base64 for small files
         }),
       });
 
@@ -409,6 +452,24 @@ const Upload = () => {
 
       if (!orderId) {
         throw new Error("Order could not be created.");
+      }
+
+      // Handle large file upload with chunked upload
+      if (selectedFile && selectedFile.size > 10 * 1024 * 1024) {
+        toast({
+          title: "Uploading large file",
+          description: "Your file is being uploaded in chunks. This may take a moment...",
+        });
+        
+        await uploadFileInChunks(selectedFile, orderId, (progress) => {
+          // You could update a progress indicator here if needed
+          console.log(`Upload progress: ${progress.toFixed(1)}%`);
+        });
+        
+        toast({
+          title: "File uploaded successfully",
+          description: "Your large file has been uploaded successfully.",
+        });
       }
 
       let paymentProcessed = false;
