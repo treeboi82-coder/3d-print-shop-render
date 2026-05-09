@@ -89,6 +89,50 @@ const uploadFileInChunks = async (file: File, orderId: string, onProgress?: (pro
   return fileId;
 };
 
+  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+    const start = chunkIndex * CHUNK_SIZE;
+    const end = Math.min(start + CHUNK_SIZE, file.size);
+    const chunk = file.slice(start, end);
+    
+    const base64Chunk = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsDataURL(chunk);
+    });
+    
+    const chunkData = {
+      orderId,
+      fileId,
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      chunkIndex,
+      totalChunks,
+      chunkData: base64Chunk.split(',')[1], // Remove data URL prefix
+      isLastChunk: chunkIndex === totalChunks - 1
+    };
+    
+    const response = await fetch(`${apiBaseUrl}/upload-chunk`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(chunkData)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Chunk upload failed: ${response.statusText}`);
+    }
+    
+    if (onProgress) {
+      const progress = ((chunkIndex + 1) / totalChunks) * 100;
+      onProgress(progress);
+    }
+  }
+  
+  return fileId;
+};
+
 const parseAsciiStlVolumeMm3 = (text: string) => {
   const vertexRegex = /vertex\s+([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s+([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s+([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)/g;
   const vertices: [number, number, number][] = [];
