@@ -282,6 +282,43 @@ const server = http.createServer(async (req, res) => {
       return res.end(JSON.stringify(newOrder));
     }
 
+    // CHUNKED UPLOAD
+    if (pathname === '/upload-chunk' && req.method === 'POST') {
+      const body = await parseBody(req);
+      const { orderId, fileId, fileName, fileSize, fileType, chunkIndex, totalChunks, chunkData, isLastChunk } = body;
+
+      if (!orderId || !fileId || !fileName || chunkData === undefined) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ error: 'Missing required chunk data' }));
+      }
+
+      const orderDir = pathLib.join(uploadsDir, orderId);
+      await fs.mkdir(orderDir, { recursive: true });
+
+      const chunkFileName = `${fileId}_chunk_${chunkIndex}`;
+      const chunkPath = pathLib.join(orderDir, chunkFileName);
+      
+      await fs.writeFile(chunkPath, Buffer.from(chunkData, 'base64'));
+
+      if (isLastChunk) {
+        // Combine all chunks into final file
+        const finalFilePath = pathLib.join(orderDir, fileName);
+        const writeStream = await fs.open(finalFilePath, 'w');
+        
+        for (let i = 0; i < totalChunks; i++) {
+          const chunkPath = pathLib.join(orderDir, `${fileId}_chunk_${i}`);
+          const chunkData = await fs.readFile(chunkPath);
+          await fs.write(writeStream, chunkData, 0, chunkData.length, null);
+          await fs.unlink(chunkPath); // Delete chunk after writing
+        }
+        
+        await fs.close(writeStream);
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ success: true, chunkIndex, isLastChunk }));
+    }
+
     // GET ORDERS
     if (pathname === '/dashboard/orders' && req.method === 'GET') {
       // Check authentication with JWT
