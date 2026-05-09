@@ -303,16 +303,16 @@ const server = http.createServer(async (req, res) => {
       if (isLastChunk) {
         // Combine all chunks into final file
         const finalFilePath = pathLib.join(orderDir, fileName);
-        const writeStream = await fs.open(finalFilePath, 'w');
+        const fileHandle = await fs.open(finalFilePath, 'w');
         
         for (let i = 0; i < totalChunks; i++) {
           const chunkPath = pathLib.join(orderDir, `${fileId}_chunk_${i}`);
           const chunkData = await fs.readFile(chunkPath);
-          await fs.write(writeStream, chunkData, 0, chunkData.length, null);
+          await fs.appendFile(finalFilePath, chunkData);
           await fs.unlink(chunkPath); // Delete chunk after writing
         }
         
-        await fs.close(writeStream);
+        await fs.close(fileHandle);
       }
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
