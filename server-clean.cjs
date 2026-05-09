@@ -11,7 +11,7 @@ const uploadsDir = pathLib.join(process.cwd(), 'uploads');
 const JWT_SECRET = 'your-secret-key-change-in-production';
 const SALT_ROUNDS = 10;
 const MAX_LOGIN_ATTEMPTS = 3;
-const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB limit for 3D files
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB limit for Vercel compatibility
 
 let orders = [];
 let loginAttempts = {}; // Track failed attempts by IP
@@ -548,7 +548,7 @@ const server = http.createServer(async (req, res) => {
       const body = await parseBody(req);
       const { status } = body;
 
-      if (!['Pending', 'Paid', 'Unpaid', 'Cancelled'].includes(status)) {
+      if (!['Pending', 'Paid', 'Unpaid', 'Cancelled', 'Closed'].includes(status)) {
         res.writeHead(400);
         return res.end(JSON.stringify({ error: 'Invalid status' }));
       }
@@ -566,6 +566,44 @@ const server = http.createServer(async (req, res) => {
 
       res.writeHead(200);
       return res.end(JSON.stringify(order));
+    }
+
+    // DELETE ORDER
+    if (pathname.startsWith('/dashboard/orders/') && req.method === 'DELETE') {
+      // Check authentication with JWT
+      const token = req.headers['x-dashboard-token'];
+      if (!token) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ error: 'Unauthorized dashboard request.' }));
+      }
+
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.role !== 'admin') {
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Forbidden: Admin access required.' }));
+        }
+      } catch (error) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ error: 'Invalid or expired token.' }));
+      }
+
+      const parts = pathname.split('/');
+      const id = parts[3]; // /dashboard/orders/:id
+
+      await loadOrders();
+
+      const orderIndex = orders.findIndex(o => o.id === id);
+      if (orderIndex === -1) {
+        res.writeHead(404);
+        return res.end(JSON.stringify({ error: 'Not found' }));
+      }
+
+      orders.splice(orderIndex, 1);
+      await saveOrders();
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ message: 'Order deleted successfully' }));
     }
 
     // DOWNLOAD FILE
