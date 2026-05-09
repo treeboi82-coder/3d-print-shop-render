@@ -1,8 +1,9 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, FileUp, UploadCloud } from "lucide-react";
+import { ArrowLeft, FileUp, UploadCloud, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const allowedExtensions = [".stl", ".obj", ".3mf", ".step", ".stp"];
 const pricePerGram = 0.15;
@@ -207,6 +208,7 @@ const estimateWeightGramsFromStl = async (file: File) => {
 
 const Upload = () => {
   const { toast } = useToast();
+  const { language, setLanguage } = useLanguage();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [clientName, setClientName] = useState("");
   const [clientPhone, setClientPhone] = useState("");
@@ -535,10 +537,19 @@ const Upload = () => {
     <div className="min-h-dvh bg-secondary p-2 md:p-6 text-ink">
       <div className="bg-panel border border-line shadow-panel min-h-[calc(100dvh-1rem)] md:min-h-[calc(100dvh-3rem)]">
         <header className="flex items-center justify-between border-b border-line px-4 md:px-6 py-4 text-xs font-mono uppercase tracking-wider">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 md:gap-4">
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+              className="flex items-center gap-2 px-2 py-1 border border-line-soft hover:bg-panel-muted transition-colors"
+              title="Change language"
+            >
+              <Globe className="size-3.5" />
+              <span className="hidden sm:inline">{language === 'en' ? 'العربية' : 'English'}</span>
+              <span className="sm:hidden">{language === 'en' ? 'AR' : 'EN'}</span>
+            </button>
             <span className="font-bold text-sm tracking-widest">3D PRINT SHOP</span>
             <span className="hidden sm:inline px-2 py-0.5 bg-panel-muted border border-line-soft">
-              Checkout Center
+              {language === 'en' ? 'Checkout Center' : 'مركز الدفع'}
             </span>
           </div>
           <Link
@@ -546,21 +557,20 @@ const Upload = () => {
             className="inline-flex items-center gap-2 text-ink-muted hover:text-ink transition-colors"
           >
             <ArrowLeft className="size-4" />
-            Back to Home
+            {language === 'en' ? 'Back to Home' : 'العودة للرئيسية'}
           </Link>
         </header>
 
         <main className="px-6 lg:px-16 py-10 lg:py-14 grid grid-cols-1 lg:grid-cols-12 gap-8">
           <section className="lg:col-span-7">
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-3">
-              Upload + Payment
+              {language === 'en' ? 'Upload + Payment' : 'رفع ودفع'}
             </p>
             <h1 className="text-4xl lg:text-5xl font-semibold tracking-tight mb-4">
-              Checkout and Upload
+              {language === 'en' ? 'Checkout and Upload' : 'الدفع والرفع'}
             </h1>
             <p className="text-ink-muted font-mono max-w-[60ch] mb-8">
-              Upload your model file to calculate weight automatically, then complete required
-              material and Jordan delivery details for checkout.
+              {language === 'en' ? 'Upload your model file to calculate weight automatically, then complete required material and Jordan delivery details for checkout.' : 'قم برفع ملف النموذج لحساب الوزن تلقائياً، ثم أكمل تفاصيل المادة والتوصيل في الأردن للدفع.'}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -571,10 +581,10 @@ const Upload = () => {
                 <div className="flex flex-col items-center text-center">
                   <UploadCloud className="size-10 text-accent mb-4" />
                   <span className="font-mono text-sm uppercase tracking-widest text-ink">
-                    Drag and drop your file
+                    {language === 'en' ? 'Drag and drop your file' : 'اسحب وأفلت ملفك'}
                   </span>
                   <span className="font-mono text-xs text-ink-muted mt-2">
-                    or click to browse from your device
+                    {language === 'en' ? 'or click to browse from your device' : 'أو انقر لتصفح من جهازك'}
                   </span>
                 </div>
                 <input
@@ -588,18 +598,18 @@ const Upload = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label className="flex flex-col gap-2 font-mono text-xs uppercase tracking-widest text-ink-muted">
-                  Name
+                  {language === 'en' ? 'Name' : 'الاسم'}
                   <input
                     type="text"
                     value={clientName}
                     onChange={(event) => setClientName(event.target.value)}
                     className="px-4 py-3 border border-line bg-panel text-ink normal-case tracking-normal text-sm"
-                    placeholder="Your name"
+                    placeholder={language === 'en' ? 'Your name' : 'اسمك'}
                     required
                   />
                 </label>
                 <label className="flex flex-col gap-2 font-mono text-xs uppercase tracking-widest text-ink-muted">
-                  Phone (Jordan)
+                  {language === 'en' ? 'Phone (Jordan)' : 'الهاتف (الأردن)'}
                   <input
                     type="tel"
                     value={clientPhone}
@@ -613,14 +623,14 @@ const Upload = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label className="flex flex-col gap-2 font-mono text-xs uppercase tracking-widest text-ink-muted">
-                  Print Material
+                  {language === 'en' ? 'Print Material' : 'مادة الطباعة'}
                   <select
                     value={printMaterial}
                     onChange={(event) => setPrintMaterial(event.target.value)}
                     className="px-4 py-3 border border-line bg-panel text-ink normal-case tracking-normal text-sm"
                     required
                   >
-                    <option value="">Select material</option>
+                    <option value="">{language === 'en' ? 'Select material' : 'اختر المادة'}</option>
                     {printMaterials.map((material) => (
                       <option key={material} value={material}>
                         {material}
@@ -629,14 +639,14 @@ const Upload = () => {
                   </select>
                 </label>
                 <label className="flex flex-col gap-2 font-mono text-xs uppercase tracking-widest text-ink-muted">
-                  Payment Method
+                  {language === 'en' ? 'Payment Method' : 'طريقة الدفع'}
                   <select
                     value={paymentMethod}
                     onChange={(event) => setPaymentMethod(event.target.value)}
                     className="px-4 py-3 border border-line bg-panel text-ink normal-case tracking-normal text-sm"
                     required
                   >
-                    <option value="">Select payment method</option>
+                    <option value="">{language === 'en' ? 'Select payment method' : 'اختر طريقة الدفع'}</option>
                     {paymentOptions
                       .filter(method => {
                         // Disable Cash on Delivery for orders over 20 JOD
@@ -653,14 +663,14 @@ const Upload = () => {
                   </select>
                   {totalPrice > 20 && (
                     <p className="text-xs text-orange-600 font-mono mt-1">
-                      ⚠ Orders over 20 JOD require prepayment (Cash on Delivery not available)
+                      ⚠ {language === 'en' ? 'Orders over 20 JOD require prepayment (Cash on Delivery not available)' : 'الطلبات التي تزيد عن 20 دينار تتطلب الدفع المسبق (الدفع عند الاستلام غير متاح)'}
                     </p>
                   )}
                 </label>
               </div>
 
               <label className="flex flex-col gap-2 font-mono text-xs uppercase tracking-widest text-ink-muted">
-                Quantity
+                {language === 'en' ? 'Quantity' : 'الكمية'}
                 <input
                   type="number"
                   min="1"
@@ -674,14 +684,14 @@ const Upload = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label className="flex flex-col gap-2 font-mono text-xs uppercase tracking-widest text-ink-muted">
-                  Governorate (Jordan)
+                  {language === 'en' ? 'Governorate (Jordan)' : 'المحافظة (الأردن)'}
                   <select
                     value={governorate}
                     onChange={(event) => setGovernorate(event.target.value)}
                     className="px-4 py-3 border border-line bg-panel text-ink normal-case tracking-normal text-sm"
                     required
                   >
-                    <option value="">Select governorate</option>
+                    <option value="">{language === 'en' ? 'Select governorate' : 'اختر المحافظة'}</option>
                     {jordanGovernorates.map((gov) => (
                       <option key={gov} value={gov}>
                         {gov}
@@ -692,19 +702,19 @@ const Upload = () => {
               </div>
 
               <label className="flex flex-col gap-2 font-mono text-xs uppercase tracking-widest text-ink-muted">
-                Delivery Address (Jordan)
+                {language === 'en' ? 'Delivery Address (Jordan)' : 'عنوان التوصيل (الأردن)'}
                 <input
                   type="text"
                   value={deliveryAddress}
                   onChange={(event) => setDeliveryAddress(event.target.value)}
                   className="px-4 py-3 border border-line bg-panel text-ink normal-case tracking-normal text-sm"
-                  placeholder="Street, building, area..."
+                  placeholder={language === 'en' ? 'Street, building, area...' : 'الشارع، المبنى، المنطقة...'}
                   required
                 />
               </label>
 
               <label className="flex flex-col gap-2 font-mono text-xs uppercase tracking-widest text-ink-muted">
-                Country
+                {language === 'en' ? 'Country' : 'البلد'}
                 <input
                   type="text"
                   value="Jordan"
@@ -714,18 +724,18 @@ const Upload = () => {
               </label>
 
               <label className="flex flex-col gap-2 font-mono text-xs uppercase tracking-widest text-ink-muted">
-                Color
+                {language === 'en' ? 'Color' : 'اللون'}
                 <input
                   type="text"
                   value={color}
                   onChange={(event) => setColor(event.target.value)}
                   className="px-4 py-3 border border-line bg-panel text-ink normal-case tracking-normal text-sm"
-                  placeholder="e.g. matte black"
+                  placeholder={language === 'en' ? 'e.g. matte black' : 'مثال: أسود مطفي'}
                 />
               </label>
 
               <div className="mt-2 font-mono text-xs text-ink-muted">
-                Supported formats: {allowedExtensions.join(", ")} (max 10 MB)
+                {language === 'en' ? 'Supported formats' : 'الصيغ المدعومة'}: {allowedExtensions.join(", ")} (max 100 MB)
               </div>
 
               <button
@@ -734,25 +744,23 @@ const Upload = () => {
                 className="w-full md:w-auto bg-ink text-panel px-6 py-3 font-mono text-sm uppercase tracking-widest hover:bg-accent transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isRedirectingToPayment
-                  ? "Redirecting to Payment..."
+                  ? (language === 'en' ? 'Redirecting to Payment...' : 'جاري التحويل للدفع...')
                   : isSending
-                  ? "Processing..."
+                  ? (language === 'en' ? 'Processing...' : 'جاري المعالجة...')
                   : isEstimatingWeight
-                    ? "Calculating Weight..."
-                    : paymentOptions.find((method) => method.label === paymentMethod)?.type === "stripe"
-                      ? "Pay Online"
-                      : "Place Order"}
+                    ? (language === 'en' ? 'Calculating Weight...' : 'جاري حساب الوزن...')
+                    : (language === 'en' ? 'Place Order' : 'تقديم الطلب')}
               </button>
             </form>
           </section>
 
           <aside className="lg:col-span-5 border border-line bg-panel-muted p-6 md:p-8">
-            <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-3">
-              Checkout Summary
+            <h2 className="font-mono text-[10px] uppercase tracking-widest text-ink-muted mb-3">
+              {language === 'en' ? 'Checkout Summary' : 'ملخص الطلب'}
             </h2>
             {!fileDetails ? (
               <div className="border border-line-soft p-6 bg-panel text-ink-muted font-mono text-sm">
-                No file selected yet.
+                {language === 'en' ? 'No file selected yet.' : 'لم يتم اختيار ملف بعد.'}
               </div>
             ) : (
               <div className="border border-line-soft p-6 bg-panel">
@@ -762,77 +770,77 @@ const Upload = () => {
                 </div>
                 <dl className="font-mono text-sm space-y-3">
                   <div className="flex justify-between border-t border-line-soft pt-3">
-                    <dt className="text-ink-muted uppercase">Type</dt>
+                    <dt className="text-ink-muted uppercase">{language === 'en' ? 'Type' : 'النوع'}</dt>
                     <dd>{fileDetails.extension}</dd>
                   </div>
                   <div className="flex justify-between border-t border-line-soft pt-3">
-                    <dt className="text-ink-muted uppercase">Size</dt>
+                    <dt className="text-ink-muted uppercase">{language === 'en' ? 'Size' : 'الحجم'}</dt>
                     <dd>{fileDetails.size}</dd>
                   </div>
                   <div className="flex justify-between border-t border-line-soft pt-3">
-                    <dt className="text-ink-muted uppercase">Weight</dt>
+                    <dt className="text-ink-muted uppercase">{language === 'en' ? 'Weight' : 'الوزن'}</dt>
                     <dd>
                       {isEstimatingWeight
-                        ? "Estimating..."
+                        ? (language === 'en' ? 'Estimating...' : 'جاري التقدير...')
                         : hasValidWeight
                           ? `${estimatedWeightGrams.toFixed(2)} g`
                           : "--"}
                     </dd>
                   </div>
                   <div className="flex justify-between border-t border-line-soft pt-3">
-                    <dt className="text-ink-muted uppercase">Rate</dt>
+                    <dt className="text-ink-muted uppercase">{language === 'en' ? 'Rate' : 'السعر'}</dt>
                     <dd>{pricePerGram.toFixed(2)} JOD / g</dd>
                   </div>
                   <div className="flex justify-between border-t border-line-soft pt-3">
-                    <dt className="text-ink-muted uppercase">Unit Price</dt>
+                    <dt className="text-ink-muted uppercase">{language === 'en' ? 'Unit Price' : 'سعر الوحدة'}</dt>
                     <dd>{hasValidWeight ? `${unitPrice.toFixed(2)} JOD` : "--"}</dd>
                   </div>
                   <div className="flex justify-between border-t border-line-soft pt-3">
-                    <dt className="text-ink-muted uppercase">Quantity</dt>
+                    <dt className="text-ink-muted uppercase">{language === 'en' ? 'Quantity' : 'الكمية'}</dt>
                     <dd>{hasValidQuantity ? parsedQuantity : "--"}</dd>
                   </div>
                   <div className="flex justify-between border-t border-line-soft pt-3">
-                    <dt className="text-ink-muted uppercase">Material</dt>
+                    <dt className="text-ink-muted uppercase">{language === 'en' ? 'Material' : 'المادة'}</dt>
                     <dd>{printMaterial || "--"}</dd>
                   </div>
                   <div className="flex justify-between border-t border-line-soft pt-3">
-                    <dt className="text-ink-muted uppercase">Color</dt>
+                    <dt className="text-ink-muted uppercase">{language === 'en' ? 'Color' : 'اللون'}</dt>
                     <dd>{color.trim() || "--"}</dd>
                   </div>
                   <div className="flex justify-between border-t border-line-soft pt-3">
-                    <dt className="text-ink-muted uppercase">Location</dt>
+                    <dt className="text-ink-muted uppercase">{language === 'en' ? 'Location' : 'الموقع'}</dt>
                     <dd>{governorate ? `${governorate}, Jordan` : "--"}</dd>
                   </div>
                   <div className="flex justify-between border-t border-line-soft pt-3">
-                    <dt className="text-ink-muted uppercase">Payment</dt>
+                    <dt className="text-ink-muted uppercase">{language === 'en' ? 'Payment' : 'الدفع'}</dt>
                     <dd>{paymentMethod || "--"}</dd>
                   </div>
                   {hasValidWeight && governorate && (
                     <>
                       <div className="flex justify-between border-t border-line-soft pt-3">
-                        <dt className="text-ink-muted uppercase">Subtotal</dt>
+                        <dt className="text-ink-muted uppercase">{language === 'en' ? 'Subtotal' : 'المجموع الفرعي'}</dt>
                         <dd>{subtotal.toFixed(2)} JOD</dd>
                       </div>
                       <div className="flex justify-between border-t border-line-soft pt-3">
-                        <dt className="text-ink-muted uppercase">Shipping</dt>
+                        <dt className="text-ink-muted uppercase">{language === 'en' ? 'Shipping' : 'الشحن'}</dt>
                         <dd>{shippingCost.toFixed(2)} JOD ({governorate})</dd>
                       </div>
                     </>
                   )}
                   <div className="flex justify-between border-t border-line-soft pt-3 font-semibold text-base">
-                    <dt className="uppercase">Total</dt>
+                    <dt className="uppercase">{language === 'en' ? 'Total' : 'المجموع الكلي'}</dt>
                     <dd>{hasValidWeight ? `${totalPrice.toFixed(2)} JOD` : "--"}</dd>
                   </div>
                 </dl>
                 {hasValidWeight && totalPrice > 20 && (
                   <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded">
                     <p className="font-mono text-xs text-orange-800">
-                      ⚠ Orders over 20 JOD require prepayment. This is a preorder - please complete payment using one of the available online payment methods.
+                      ⚠ {language === 'en' ? 'Orders over 20 JOD require prepayment. This is a preorder - please complete payment using one of the available online payment methods.' : 'الطلبات التي تزيد عن 20 دينار تتطلب الدفع المسبق. هذا طلب مسبق - يرجى إكمال الدفع باستخدام إحدى طرق الدفع الإلكترونية المتاحة.'}
                     </p>
                   </div>
                 )}
                 <p className="font-mono text-xs text-ink-muted mt-5">
-                  Weight is estimated automatically from uploaded STL or OBJ geometry.
+                  {language === 'en' ? 'Weight is estimated automatically from uploaded STL or OBJ geometry.' : 'يتم حساب الوزن تلقائياً من ملفات STL أو OBJ المرفوعة.'}
                 </p>
                 {weightError ? (
                   <p className="font-mono text-xs text-red-600 mt-2">{weightError}</p>
