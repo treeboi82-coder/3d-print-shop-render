@@ -19,6 +19,7 @@ const jordanGovernorates = [
   "Karak",
   "Tafilah",
   "Ma'an",
+  "Aqaba",
 ];
 const printMaterials = ["PLA", "PETG", "ABS", "TPU"];
 const jordanPhoneRegex = /^(?:\+962|0)7[789]\d{7}$/;
@@ -636,12 +637,25 @@ const Upload = () => {
                     required
                   >
                     <option value="">Select payment method</option>
-                    {paymentOptions.map((method) => (
-                      <option key={method.id} value={method.label}>
-                        {method.label}
-                      </option>
-                    ))}
+                    {paymentOptions
+                      .filter(method => {
+                        // Disable Cash on Delivery for orders over 20 JOD
+                        if (totalPrice > 20 && method.label === 'Cash on Delivery') {
+                          return false;
+                        }
+                        return true;
+                      })
+                      .map((method) => (
+                        <option key={method.id} value={method.label}>
+                          {method.label}
+                        </option>
+                      ))}
                   </select>
+                  {totalPrice > 20 && (
+                    <p className="text-xs text-orange-600 font-mono mt-1">
+                      ⚠ Orders over 20 JOD require prepayment (Cash on Delivery not available)
+                    </p>
+                  )}
                 </label>
               </div>
 
@@ -810,6 +824,13 @@ const Upload = () => {
                     <dd>{hasValidWeight ? `${totalPrice.toFixed(2)} JOD` : "--"}</dd>
                   </div>
                 </dl>
+                {hasValidWeight && totalPrice > 20 && (
+                  <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded">
+                    <p className="font-mono text-xs text-orange-800">
+                      ⚠ Orders over 20 JOD require prepayment. This is a preorder - please complete payment using one of the available online payment methods.
+                    </p>
+                  </div>
+                )}
                 <p className="font-mono text-xs text-ink-muted mt-5">
                   Weight is estimated automatically from uploaded STL or OBJ geometry.
                 </p>
