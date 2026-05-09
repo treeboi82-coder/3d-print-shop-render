@@ -516,6 +516,17 @@ const Upload = () => {
 
     if (!file) return;
 
+    // Check file size immediately (10MB limit for Vercel)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please upload a file smaller than 10 MB.",
+        variant: "destructive"
+      });
+      setSelectedFile(null);
+      return;
+    }
+
     setIsEstimatingWeight(true);
     try {
       const estimatedWeight = await estimateWeightGramsFromStl(file);
